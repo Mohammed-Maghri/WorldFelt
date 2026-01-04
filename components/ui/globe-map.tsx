@@ -4,6 +4,41 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import maplibregl from "maplibre-gl";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Truncated text component with show more/less
+function TruncatedText({ 
+  text, 
+  maxLength = 50,
+  className = "",
+}: { 
+  text: string; 
+  maxLength?: number;
+  className?: string;
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const needsTruncation = text.length > maxLength;
+  
+  const displayText = needsTruncation && !isExpanded 
+    ? text.slice(0, maxLength).trim() + "..." 
+    : text;
+  
+  return (
+    <span className={className}>
+      "{displayText}"
+      {needsTruncation && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsExpanded(!isExpanded);
+          }}
+          className="ml-1 text-cyan-400/70 hover:text-cyan-400 text-xs font-medium transition-colors"
+        >
+          {isExpanded ? "show less" : "show more"}
+        </button>
+      )}
+    </span>
+  );
+}
+
 // Feeling options for sharing
 const FEELING_OPTIONS = [
   { feeling: "hopeful", color: "#22d3ee", emoji: "✨" },
@@ -111,8 +146,8 @@ function GalaxyCluster({
           </p>
           
           {/* Message */}
-          <p className="text-sm md:text-base font-[family-name:var(--font-smooch-sans)] leading-tight text-white/70">
-            "{feeling.message}"
+          <p className="text-sm md:text-base font-[family-name:var(--font-smooch-sans)] leading-tight text-white/70 break-words">
+            <TruncatedText text={feeling.message} maxLength={40} />
           </p>
           
           {/* Time */}
@@ -364,8 +399,8 @@ function GalaxyCluster({
           </div>
           
           {/* Message */}
-          <p className="text-sm md:text-base font-[family-name:var(--font-smooch-sans)] leading-snug text-white/90 pl-5 md:pl-6">
-            "{selectedFeeling.message}"
+          <p className="text-sm md:text-base font-[family-name:var(--font-smooch-sans)] leading-snug text-white/90 pl-5 md:pl-6 break-words">
+            <TruncatedText text={selectedFeeling.message} maxLength={50} />
           </p>
           
           {/* Time */}
@@ -1506,8 +1541,8 @@ export function GlobeMap() {
                           
                           {/* Content */}
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm md:text-base font-[family-name:var(--font-smooch-sans)] text-white/90">
-                              "{feeling.comment || 'No message'}"
+                            <p className="text-sm md:text-base font-[family-name:var(--font-smooch-sans)] text-white/90 break-words">
+                              <TruncatedText text={feeling.comment || 'No message'} maxLength={50} />
                             </p>
                             <p className="text-xs text-white/40 font-[family-name:var(--font-smooch-sans)] mt-1">
                               feeling <span style={{ color: feelingOption?.color }}>{feeling.feeling}</span>
@@ -1674,8 +1709,8 @@ export function GlobeMap() {
                   <p className="font-[family-name:var(--font-smooch-sans)] text-xl mb-1 text-white/90">
                     feeling <span style={{ color: selectedFeeling.color }} className="font-medium">{selectedFeeling.feeling}</span>
                   </p>
-                  <p className="text-base font-[family-name:var(--font-smooch-sans)] mb-2 text-white/70">
-                    "{selectedFeeling.message}"
+                  <p className="text-base font-[family-name:var(--font-smooch-sans)] mb-2 text-white/70 break-words">
+                    <TruncatedText text={selectedFeeling.message} maxLength={60} />
                   </p>
                   <p className="text-sm font-[family-name:var(--font-smooch-sans)] text-white/40">
                     {selectedFeeling.user} · {selectedFeeling.time}
