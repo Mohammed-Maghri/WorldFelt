@@ -97,6 +97,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate comment length (max 100 characters)
+    if (comment && comment.length > 100) {
+      return NextResponse.json(
+        { error: 'Comment is too long. Maximum 100 characters allowed.' },
+        { status: 400 }
+      );
+    }
+
     // Create the feeling with userId
     const newFeeling = await prisma.feeling.create({
       data: {
