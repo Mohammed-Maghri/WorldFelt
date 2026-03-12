@@ -73,7 +73,13 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const { latitude, longitude, feeling, comment } = body;
-
+    // Fix: Prevent very long comments
+    if (comment && comment.length > 100) {
+      return NextResponse.json(
+        { error: 'Comment is too long. Please keep it under 100 characters.' },
+        { status: 400 }
+      );
+    }
     // Validate required fields
     if (!latitude || !longitude || !feeling) {
       return NextResponse.json(
